@@ -53,7 +53,7 @@ def takens_embedding(
     d: int = 3,
     tau: int = 1,
 ) -> NDArray[np.float64]:
-    """Time-delay (Takens) embedding of a 1-D series into R^d.  [TODO]
+    """Time-delay (Takens) embedding of a 1-D series into R^d.  [IMPLEMENTED]
 
     Map the scalar series ``s`` to a cloud of delay vectors. Row ``j`` is
 
@@ -79,4 +79,15 @@ def takens_embedding(
     Raises:
         ValueError: If the series is too short, or d/tau are non-positive.
     """
-    raise NotImplementedError("implement takens_embedding")
+    if d <= 0 or tau <= 0:
+        raise ValueError("Embedding dimension and time delay must be positive.")
+
+    if len(series) - (d - 1) * tau < 1:
+        raise ValueError("Series is too short to form even one delay vector.")
+
+    n_rows = len(series) - (d - 1) * tau
+    arr = np.zeros((n_rows, d))
+    for i in range(n_rows):
+        for j in range(d):
+            arr[i, j] = series[i + j * tau]
+    return arr

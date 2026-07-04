@@ -31,7 +31,7 @@ def test_sub_windows_rejects_bad_len():
 
 # --- takens_embedding: stub -> xfail until you implement it ------------------
 
-@pytest.mark.xfail(raises=NotImplementedError, reason="TODO: takens_embedding", strict=True)
+#@pytest.mark.xfail(raises=NotImplementedError, reason="TODO: takens_embedding", strict=True)
 def test_takens_toy(toy_series):
     # A = [1, -2, 3, -1, 2], d=2, tau=1  ->  the delay vectors from the discussion
     out = takens_embedding(toy_series, d=2, tau=1)
@@ -40,14 +40,14 @@ def test_takens_toy(toy_series):
     assert np.allclose(out, expected)
 
 
-@pytest.mark.xfail(raises=NotImplementedError, reason="TODO: takens_embedding", strict=True)
+#@pytest.mark.xfail(raises=NotImplementedError, reason="TODO: takens_embedding", strict=True)
 def test_takens_paper_shape():
     series = np.arange(126, dtype=float)
     out = takens_embedding(series, d=3, tau=1)
     assert out.shape == (124, 3)  # 126 - (3-1)*1 = 124 points in R^3
 
 
-@pytest.mark.xfail(raises=NotImplementedError, reason="TODO: takens_embedding", strict=True)
+#@pytest.mark.xfail(raises=NotImplementedError, reason="TODO: takens_embedding", strict=True)
 def test_takens_too_short_raises():
     with pytest.raises(ValueError):
         takens_embedding(np.array([1.0, 2.0]), d=3, tau=1)  # needs >= 3 points
