@@ -42,14 +42,14 @@ def test_lp_norm_zero_landscape():
 
 # --- persistence_landscape: stub -> xfail ------------------------------------
 
-@pytest.mark.xfail(raises=NotImplementedError, reason="TODO: persistence_landscape", strict=True)
+#@pytest.mark.xfail(raises=NotImplementedError, reason="TODO: persistence_landscape", strict=True)
 def test_persistence_landscape_shape():
     dgm = np.array([[0.0, 1.0], [0.0, 2.0]])
     ls = persistence_landscape(dgm, num_layers=1, resolution=100, x_range=(0.0, 2.0))
     assert ls.shape == (1, 100)
 
 
-@pytest.mark.xfail(raises=NotImplementedError, reason="TODO: persistence_landscape", strict=True)
+#@pytest.mark.xfail(raises=NotImplementedError, reason="TODO: persistence_landscape", strict=True)
 def test_persistence_landscape_empty_diagram():
     ls = persistence_landscape(np.empty((0, 2)), num_layers=1, resolution=50, x_range=(0.0, 1.0))
     assert ls.shape == (1, 50)

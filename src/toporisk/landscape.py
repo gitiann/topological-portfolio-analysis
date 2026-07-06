@@ -31,9 +31,12 @@ def persistence_landscape(
     diagram: Diagram,
     num_layers: int = 1,
     resolution: int = 500,
-    x_range: tuple[float, float] | None = None,
+    x_range: tuple[float, float] | None = None
 ) -> Landscape:
-    """Sampled persistence landscape of a (finite) diagram.  [TODO]
+    """Sampled persistence landscape of a (finite) diagram.  [IMPLEMENTED]
+
+    eta_k (t) = k-th largest value of Lambda_{(b,d)}(t) over all points in the diagram.
+    num_layers = number of landscape layers eta_1, ..., eta_{num_layers} to sample (default is 1 as per paper).
 
     The landscape turns each finite pair (b, d) into a tent function
 
@@ -65,11 +68,38 @@ def persistence_landscape(
     Returns:
         Array of shape ``(num_layers, resolution)``.
     """
-    raise NotImplementedError("implement persistence_landscape")
+
+    if diagram is None or diagram.size == 0:
+        return np.zeros((num_layers, resolution))
+    if x_range is None:
+        x_range = (0.0, float(diagram[:, 1].max()))
+
+    tent_values_at_t = np.zeros((diagram.shape[0], resolution))
+    for i in range(diagram.shape[0]):
+        birth = diagram[i, 0]
+        death = diagram[i, 1]
+        if birth > death:
+            raise ValueError(f"Invalid diagram point: {diagram[i]} (birth > death)")
+        if birth < x_range[0] or death > x_range[1]:
+            raise ValueError(f"Diagram point {diagram[i]} is outside the x_range {x_range}")
+        for t in range(resolution):
+            tick = x_range[0] + t * (x_range[1] - x_range[0]) / (resolution - 1)
+            tent_values_at_t[i, t] = max(0.0, min(tick - birth, death - tick))
+
+    eta = np.zeros((num_layers, resolution))
+    for t in range(resolution):
+        sorted_tent_values = np.sort(tent_values_at_t[:, t])[::-1]
+        for k in range(num_layers):
+            if k < len(sorted_tent_values):
+                eta[k, t] = sorted_tent_values[k]
+            else:
+                eta[k, t] = 0.0
+
+    return eta
 
 
 def lp_norm(landscape: Landscape, p: float = 1.0, dx: float = 1.0) -> float:
-    """L^p norm of a sampled landscape.  [TODO]
+    """L^p norm of a sampled landscape.  [IMPLEMENTED]
 
     Treating the sampled landscape as (approximations of) functions, the L^p
     norm stacked over layers is
@@ -90,7 +120,12 @@ def lp_norm(landscape: Landscape, p: float = 1.0, dx: float = 1.0) -> float:
     Returns:
         The scalar L^p norm (0.0 for an all-zero landscape).
     """
-    raise NotImplementedError("implement lp_norm")
+    landscape = np.asarray(landscape, dtype=np.float64)
+    if landscape.size == 0:
+        return 0.0
+    if p <= 0:
+        raise ValueError("p must be positive")
+    return float(np.sum(np.abs(landscape) ** p) * dx) ** (1.0 / p)
 
 
 def mean_landscape(landscapes: list[Landscape]) -> Landscape:
