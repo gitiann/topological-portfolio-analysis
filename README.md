@@ -17,7 +17,7 @@ the H0 (connected-components) persistence landscape of each cloud, and measure h
 much the landscape's L¹ norm *varies* across sub-windows. That variability is the
 asset's **topological risk** Λᵢ. Assets are then coupled only through a diagonal
 risk matrix `Q = diag(Λᵢ)` and a long-only quadratic program that minimises
-`wᵀQw`. There is no cross-asset topology in this model — by design (the paper
+`wᵀQw`. There is no cross-asset topology in this model by design (the paper
 flags cross-asset coupling as future work).
 
 Fixed parameters, per the paper (verify against your copy): simple returns;
@@ -53,35 +53,23 @@ toporisk build --prices data/sample_prices.csv --out figures/weights.png
 The CLI runs once you've implemented the stubs; before that it exits with a clear
 "not implemented" message.
 
-## Roadmap — the five functions, in order
+## Roadmap
 
 Each has an `xfail(strict=True)` test. Correct implementation flips it to a
 pass (reported as an unexpected pass); then delete the marker.
 
-1. `embedding.takens_embedding` — you already derived it: length-`T̃` series,
+1. [IMPLEMENTED]`embedding.takens_embedding` — you already derived it: length-`T̃` series,
    `d=3, τ=1` → `T̃-2` points in R³. The toy test pins the exact vectors from the
    `[1,-2,3,-1,2]` example; the shape test pins `124×3`.
-2. `landscape.persistence_landscape` — tent functions → sampled landscape on a
+2. [IMPLEMENTED]`landscape.persistence_landscape` — tent functions → sampled landscape on a
    **fixed shared grid**. Read the module docstring on *why* the grid must be
    shared before you write it.
-3. `landscape.lp_norm` — discrete Lᵖ norm of a sampled landscape (`p=1`).
-4. `risk.asset_topological_risk` — the capstone. Composes 1–3 over the
+3. [IMPLEMENTED]`landscape.lp_norm` — discrete Lᵖ norm of a sampled landscape (`p=1`).
+4. [IN_PROGRESS]`risk.asset_topological_risk` — the capstone. Composes 1–3 over the
    sub-windows. The reference is `‖mean landscape‖`, **not** `mean(‖landscape‖)`.
    This is the whole reason the landscape API returns an object, not a float.
-5. `portfolio.min_topological_risk_portfolio` — the convex QP.
+5. [TODO]`portfolio.min_topological_risk_portfolio` — the convex QP.
 
-## What to derive by hand before coding (not optional)
-
-- **Step 4, the trap.** State in one sentence why a `landscape_norm(diagram)→float`
-  API cannot produce Λᵢ. If you can't, you don't yet understand the risk measure.
-- **Step 5, the closed form.** For strictly-positive diagonal `Q`, solve
-  `min wᵀQw` s.t. `Σw=1, w≥0` by hand (Lagrange). Show the no-short constraint is
-  inactive, and identify what the resulting weights *are*. You will find the
-  "optimisation" collapses to something very simple — know what, and know why the
-  interesting version only appears once you add a cardinality constraint (a MIQP).
-- **The volatility question.** With H0, `d=3`, `τ=1`, how much of Λᵢ is just a
-  reparametrisation of asset *i*'s return dispersion? Be able to argue what the
-  topology adds over plain volatility. (This is where H1 would earn its keep.)
 
 ## Honest scope
 

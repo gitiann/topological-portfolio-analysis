@@ -28,6 +28,24 @@ def asset_topological_risk(
     num_layers: int = 1,
     resolution: int = 500,
 ) -> float:
+    global_max = 0.0
+    landscape = []
+    finite_diagrams = []
+    for sub_window in sub_windows(series, sub_len, shift):
+        point_cloud = takens_embedding(sub_window, d=d, tau=tau)
+        diagram = persistence_diagram_h0(point_cloud)
+        finite_diagrams.append(finite_pairs(diagram))
+        for death in finite_diagram[:, 1]:
+            if global_max < death:
+                global_max = death
+
+    for finite_diagram in finite_diagrams:
+        landscape.append(persistence_landscape(finite_diagram, num_layers=num_layers, resolution=resolution, x_range=(0.0, global_max)))
+    
+    eta_bar = mean_landscape(landscape)
+    Lambda = sum((lp_norm(eta, p) - lp_norm(eta_bar, p))**2 for eta in landscape)
+    return Lambda
+
     """Topological risk Lambda_i of a single asset over one training window.  [TODO]
 
     Compose the whole per-asset pipeline:
