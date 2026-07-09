@@ -69,19 +69,3 @@ pass (reported as an unexpected pass); then delete the marker.
    sub-windows. The reference is `‖mean landscape‖`, **not** `mean(‖landscape‖)`.
    This is the whole reason the landscape API returns an object, not a float.
 5. [TODO]`portfolio.min_topological_risk_portfolio` — the convex QP.
-
-
-## Honest scope
-
-Using Gudhi to compute persistence is standard; you are not meant to reimplement
-Vietoris–Rips. What this project demonstrates is that you can turn a paper's
-method into correct, tested, modular code — the Takens embedding, the landscape
-and its norm, the risk assembly (with the mean-landscape subtlety), and the QP.
-Don't claim more on a CV than you've built and can defend.
-
-## Stretch
-
-Real S&P 500 data and a rolling backtest against the paper's benchmarks; then the
-two openings the authors leave: (a) tuning `d`, `τ` per asset via average mutual
-information / false-nearest-neighbours instead of fixing them; (b) modelling
-cross-asset topological interaction so `Q` is no longer diagonal.
