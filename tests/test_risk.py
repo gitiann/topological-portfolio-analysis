@@ -27,3 +27,14 @@ def test_asset_topological_risk_nonnegative():
     series = rng.normal(scale=0.01, size=252)
     val = asset_topological_risk(series, sub_len=126, shift=21, d=3, tau=1)
     assert val >= 0.0
+
+
+def test_identical_windows_give_zero_risk():
+    # A perfectly periodic series: every sub-window sees the same pattern,
+    # so every landscape is identical -> mean landscape == each -> Lambda == 0.
+    # Period chosen to divide the shift so windows align identically.
+    period = np.array([0.01, -0.02, 0.015, -0.005])
+    series = np.tile(period, 100)           # long, exactly periodic
+    val = asset_topological_risk(series, sub_len=126, shift=len(period))
+    assert val == pytest.approx(0.0, abs=1e-9)
+
