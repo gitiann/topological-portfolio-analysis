@@ -21,7 +21,7 @@ def test_risk_matrix_rejects_negative():
 
 # --- asset_topological_risk: stub -> xfail -----------------------------------
 
-@pytest.mark.xfail(raises=NotImplementedError, reason="TODO: asset_topological_risk", strict=True)
+#@pytest.mark.xfail(raises=NotImplementedError, reason="TODO: asset_topological_risk", strict=True)
 def test_asset_topological_risk_nonnegative():
     rng = np.random.default_rng(0)
     series = rng.normal(scale=0.01, size=252)

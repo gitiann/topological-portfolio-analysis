@@ -18,6 +18,7 @@ from toporisk.landscape import lp_norm, mean_landscape, persistence_landscape  #
 from toporisk.topology import finite_pairs, persistence_diagram_h0  # noqa: F401
 
 
+
 def asset_topological_risk(
     series: NDArray[np.float64],
     sub_len: int = 126,
@@ -28,25 +29,8 @@ def asset_topological_risk(
     num_layers: int = 1,
     resolution: int = 500,
 ) -> float:
-    global_max = 0.0
-    landscape = []
-    finite_diagrams = []
-    for sub_window in sub_windows(series, sub_len, shift):
-        point_cloud = takens_embedding(sub_window, d=d, tau=tau)
-        diagram = persistence_diagram_h0(point_cloud)
-        finite_diagrams.append(finite_pairs(diagram))
-        for death in finite_diagram[:, 1]:
-            if global_max < death:
-                global_max = death
-
-    for finite_diagram in finite_diagrams:
-        landscape.append(persistence_landscape(finite_diagram, num_layers=num_layers, resolution=resolution, x_range=(0.0, global_max)))
     
-    eta_bar = mean_landscape(landscape)
-    Lambda = sum((lp_norm(eta, p) - lp_norm(eta_bar, p))**2 for eta in landscape)
-    return Lambda
-
-    """Topological risk Lambda_i of a single asset over one training window.  [TODO]
+    """Topological risk Lambda_i of a single asset over one training window.  [IMPLEMENTED]
 
     Compose the whole per-asset pipeline:
 
@@ -85,7 +69,28 @@ def asset_topological_risk(
     Returns:
         Lambda_i >= 0.
     """
-    raise NotImplementedError("implement asset_topological_risk")
+    if len(series) < sub_len:
+        raise ValueError(f"series length {len(series)} too short for sub_len {sub_len}")
+    landscape = []
+    finite_diagrams = []
+    for sub_window in sub_windows(series, sub_len, shift):
+        point_cloud = takens_embedding(sub_window, d=d, tau=tau)
+        diagram = persistence_diagram_h0(point_cloud)
+        finite_diagrams.append(finite_pairs(diagram))
+    deaths = np.concatenate(finite_diagrams)[:, 1]
+    if deaths.size == 0: 
+        return 0.0
+    
+    global_max = deaths.max()
+
+    for finite_diagram in finite_diagrams:
+        landscape.append(persistence_landscape(finite_diagram, num_layers=num_layers, resolution=resolution, x_range=(0.0, global_max)))
+    
+    eta_bar = mean_landscape(landscape)
+    dx = global_max / (resolution - 1)
+    Lambda = sum((lp_norm(eta, dx, p=p) - lp_norm(eta_bar, dx, p=p))**2 for eta in landscape)
+    return Lambda
+
 
 
 def risk_matrix(risks: NDArray[np.float64]) -> NDArray[np.float64]:
@@ -106,4 +111,5 @@ def risk_matrix(risks: NDArray[np.float64]) -> NDArray[np.float64]:
     risks = np.asarray(risks, dtype=np.float64)
     if (risks < 0).any():
         raise ValueError("topological risks must be non-negative")
+
     return np.diag(risks)

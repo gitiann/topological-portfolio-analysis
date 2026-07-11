@@ -98,7 +98,7 @@ def persistence_landscape(
     return eta
 
 
-def lp_norm(landscape: Landscape, p: float = 1.0, dx: float = 1.0) -> float:
+def lp_norm(landscape: Landscape, dx: float, p: float=1.0) -> float:
     """L^p norm of a sampled landscape.  [IMPLEMENTED]
 
     Treating the sampled landscape as (approximations of) functions, the L^p

@@ -35,4 +35,12 @@ def min_topological_risk_portfolio(Q: NDArray[np.float64]) -> NDArray[np.float64
     Returns:
         Optimal weight vector, shape ``(n,)``.
     """
-    raise NotImplementedError("implement min_topological_risk_portfolio")
+    lambdas = np.diag(Q)
+    w = np.zeros(len(lambdas))
+    pos = lambdas > 0
+    if not pos.any():
+        raise ValueError("all topological risks are zero; no investable asset")
+    inv = 1.0 / lambdas[pos]
+    w[pos] = inv / inv.sum()
+    return w
+     
