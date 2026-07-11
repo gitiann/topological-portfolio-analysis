@@ -30,6 +30,7 @@ def plot_weights(
     ax.set_ylabel("weight")
     ax.set_title("Minimum topological-risk portfolio")
     ax.tick_params(axis="x", rotation=90)
+    plt.tight_layout()
     return ax
 
 
