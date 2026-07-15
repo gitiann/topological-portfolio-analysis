@@ -60,3 +60,29 @@ def test_persistence_landscape_empty_diagram():
     ls = persistence_landscape(np.empty((0, 2)), num_layers=1, resolution=50, x_range=(0.0, 1.0))
     assert ls.shape == (1, 50)
     assert np.allclose(ls, 0.0)
+
+
+def test_landscape_single_tent_values():
+    # one pair (0,2) on grid [0,2] with 5 ticks: 0, 0.5, 1, 1.5, 2
+    # tent(t) = max(0, min(t-0, 2-t)) -> peak 1.0 at t=1
+    dgm = np.array([[0.0, 2.0]])
+    ls = persistence_landscape(dgm, num_layers=1, resolution=5, x_range=(0.0, 2.0))
+    assert np.allclose(ls[0], [0.0, 0.5, 1.0, 0.5, 0.0])
+
+
+def test_landscape_two_tents_ranking_and_padding():
+    # pairs (0,2) and (0,1). At t=1.0 only the first tent is non-zero,
+    # so eta_2 must be 0 there -- this is the zero-padding path.
+    dgm = np.array([[0.0, 2.0], [0.0, 1.0]])
+    ls = persistence_landscape(dgm, num_layers=2, resolution=5, x_range=(0.0, 2.0))
+    assert np.allclose(ls[0], [0.0, 0.5, 1.0, 0.5, 0.0])   # pointwise max
+    assert np.allclose(ls[1], [0.0, 0.5, 0.0, 0.0, 0.0])   # pointwise 2nd largest
+
+def test_landscape_matches_gudhi():
+    # Gudhi uses the perpendicular-to-diagonal convention (peak = (d-b)/sqrt(2));
+    # we use Bubenik's standard tent (peak = (d-b)/2). They differ by exactly sqrt(2).
+    from gudhi.representations import Landscape
+    dgm = np.array([[0.0, 2.0], [0.0, 1.0], [0.0, 1.5]])
+    mine = persistence_landscape(dgm, num_layers=2, resolution=50, x_range=(0.0, 2.0))
+    theirs = Landscape(num_landscapes=2, resolution=50, sample_range=[0.0, 2.0]).fit_transform([dgm])[0]
+    assert np.allclose(mine.ravel() * np.sqrt(2), theirs, atol=1e-8)
