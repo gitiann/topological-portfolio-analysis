@@ -12,7 +12,7 @@ topological risk, and the portfolio quadratic program.  The  scaffolding
 Using topology of data we can avoid model-based estimation errors linked to distributional assumptions or statistical inputs like mean and covariance. A 2026 January paper by Goel, Sharma, Kanniainen (arXiv: https://doi.org/10.48550/arXiv.2601.03974) reports that portfolios constructed using Topological Data Analysis methods outperformed the seven popular portfolio optimization models and two benchmark portfolio strategies, the naive **1/N** portfolio and the S&P 500 market index, in terms of excess mean return and several financial ratios.
 
 The practical argument is dimensional. Minimum-variance needs the full
-covariance matrix — n(n+1)/2 parameters, or 106,953 for 462 assets estimated
+covariance matrix with n(n+1)/2 parameters, or 106,953 for 462 assets estimated
 from 252 trading days, at which point the sample covariance is singular.
 Topological risk needs n parameters, one per asset, each estimated from that
 asset's own history.
@@ -28,7 +28,7 @@ From a topological point of view, more scattering of the point cloud means less 
 ## What this project covers
 
 Implementation and verification of the method, plus characterisation of the risk
-measure. **Portfolio performance is not evaluated here** — testing the paper's
+measure. **Portfolio performance is not evaluated here**; testing the paper's
 performance claim requires their 462-constituent universe; a 19-name basket
 cannot settle it.
 
