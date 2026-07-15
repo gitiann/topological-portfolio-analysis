@@ -14,3 +14,5 @@ data/*.csv
 !data/sample_prices.csv
 figures/
 *.png
+.DS_Store
+*.log
