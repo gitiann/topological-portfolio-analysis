@@ -5,21 +5,37 @@ Kanniainen (2026, arXiv:2601.03974). I implemented the mathematical core myself:
 the Takens embedding, the persistence landscape and its $L^1$ norm, the asset
 topological risk, and the portfolio quadratic program.  The  scaffolding
 (packaging, CLI, test harness and plotting) was written with AI assistance. All
-31 tests pass, and the pipeline has been validated on real S&P constituent data.
+34 tests pass, and the pipeline has been characterised on real S&P constituent data.
 
 # toporisk — topological risk portfolios
 
 Using topology of data we can avoid model-based estimation errors linked to distributional assumptions or statistical inputs like mean and covariance. A 2026 January paper by Goel, Sharma, Kanniainen (arXiv: https://doi.org/10.48550/arXiv.2601.03974) reports that portfolios constructed using Topological Data Analysis methods outperformed the seven popular portfolio optimization models and two benchmark portfolio strategies, the naive **1/N** portfolio and the S&P 500 market index, in terms of excess mean return and several financial ratios.
 
-This model has significant potential in cases characterized by a high degree of model uncertainty accompanied by substantial estimation errors.
+The practical argument is dimensional. Minimum-variance needs the full
+covariance matrix — n(n+1)/2 parameters, or 106,953 for 462 assets estimated
+from 252 trading days, at which point the sample covariance is singular.
+Topological risk needs n parameters, one per asset, each estimated from that
+asset's own history.
 
 The intuitive idea is that we map a one-dimensional time-series of returns into $\mathbb{R}^3$ space as data-points via Takens' delay embedding. Next we form a simplicial complex using the Vietoris-Rips method by connecting any two data-points that fall within a radius. The radius starts at 0, in which case all points are disconnected (unless they map to the same place, as with constant returns). We continuously increase the radius, and whenever two points fall within it we connect them via an edge. As the radius increases new connections are made, and we are interested in how well the overall shape is connected through the varying radius.
 
 It may happen that at some radius $r_i$ we end up with $n$ distinct point-clouds not connected to each other. This is precisely what the 0-th homology group $H_0$ measures: the sequence of merges, each recorded as a (birth, death) pair, where death is the radius at which two components merge. A tightly clustered cloud merges quickly at small radii; a scattered cloud may have components surviving to large radii. We summarise the topology of our space via a **persistence landscape** (a series of time-dependent functions $\eta_k(t)$, $k = 1, 2, \ldots$).
 
-From a topological point of view, more scattering of the point cloud means less stable returns; a more concentrated cloud, more stable. The amount of scatteredness among return observations over time can be quantified using the $L_1$ norm of the persistence landscape. Therefore this norm can effectively track changes in the state of stock return dynamics without any prior distributional assumptions. Lastly, the persistence landscape forms a Banach space, so the theory of random variables can be applied to it. By definition it involves no parameter and is thus free from parameter tuning and over-fitting risk.[1]
+From a topological point of view, more scattering of the point cloud means less stable returns; a more concentrated cloud, more stable. The amount of scatteredness among return observations over time can be quantified using the $L_1$ norm of the persistence landscape. Therefore this norm can effectively track changes in the state of stock return dynamics without any prior distributional assumptions. Lastly, the persistence landscape forms a Banach space, so the theory of random variables can be applied to it. Given a persistence diagram, the landscape is a canonical summary requiring no kernel or bandwidth choice, unlike persistence images.[1] The pipeline that produces the diagram does have parameters, fixed below by convention rather than tuned.
 
 >[1] Bubenik, P., et al. *Statistical topological data analysis using persistence landscapes.* J. Mach. Learn. Res. **16**(1), 77–102 (2015).
+
+## What this project covers
+
+Implementation and verification of the method, plus characterisation of the risk
+measure. **Portfolio performance is not evaluated here** — testing the paper's
+performance claim requires their 462-constituent universe; a 19-name basket
+cannot settle it.
+
+**Topological risk is distinct from volatility.** Across 19 US large-caps
+(2018–2023), Λ ranks assets similarly but not identically to annualised
+volatility (Spearman ρ ≈ 0.73). Several names (CAT, XOM) are volatile yet
+topologically calm; these individual divergences were not investigated further.
 
 ## The model
 
@@ -29,16 +45,17 @@ Fixed parameters, per the paper (verify against your copy): simple returns; `d =
 
 ## Layout
 
-```src/toporisk/
-data.py        load prices, simple returns                 [implemented]
-embedding.py   sub_windows, takens_embedding               [implemented]
-topology.py    Gudhi H0 diagram, finite_pairs              [implemented]
-landscape.py   mean_landscape, persistence_landscape, lp_norm   [implemented]
-risk.py        risk_matrix, asset_topological_risk         [implemented]
-portfolio.py   min_topological_risk_portfolio              [implemented]
-cli.py         toporisk build ...                        [implemented]
-viz.py         weight + landscape plots                    [implemented]
-tests/           pytest (31 passing)
+```
+src/toporisk/
+   data.py        load prices, simple returns                 
+   embedding.py   sub_windows, takens_embedding               
+   topology.py    Gudhi H0 diagram, finite_pairs              
+   landscape.py   mean_landscape, persistence_landscape, lp_norm   
+   risk.py        risk_matrix, asset_topological_risk         
+   portfolio.py   min_topological_risk_portfolio              
+   cli.py         toporisk build ...                       
+   viz.py         weight + landscape plots                    
+tests/           pytest (34 passing)
 scripts/         make_sample_data.py
 ```
 
@@ -63,5 +80,13 @@ The pipeline is built and tested end to end. Key functions:
 1. `embedding.takens_embedding` — length-`T̃` series, `d=3, τ=1` → `T̃-2` points in $\mathbb{R}^3$.
 2. `landscape.persistence_landscape` — tent functions sampled on a fixed shared grid, so landscapes from different sub-windows can be averaged pointwise.
 3. `landscape.lp_norm` — discrete Lᵖ norm of a sampled landscape (`p=1`), grid-spacing aware.
-4. `risk.asset_topological_risk` — composes 1–3 over the sub-windows. The reference term is `‖mean landscape‖`, **not** `mean(‖landscape‖)`.
+4. `risk.asset_topological_risk` — composes 1–3 over the sub-windows. The
+   reference term is `‖mean landscape‖`. At `p=1` this coincides with
+   `mean(‖landscape‖)` since the L¹ norm is linear on non-negative functions,
+   but the distinction matters if `p` is changed.
 5. `portfolio.min_topological_risk_portfolio` — the convex QP; for diagonal `Q` it reduces to inverse-risk weighting, with zero-risk assets excluded.
+6. Landscape convention: this implementation uses Bubenik's tent, peak
+   `(d−b)/2`. Gudhi's `representations.Landscape` measures perpendicular
+   distance to the diagonal, peak `(d−b)/√2`. The two agree up to that factor
+   (verified in `test_landscape_matches_gudhi`), which scales Λ by 2 and leaves
+   portfolio weights unchanged, since the QP's argmin is scale-invariant.
