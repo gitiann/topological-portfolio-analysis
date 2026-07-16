@@ -1,10 +1,7 @@
 """Persistence landscapes and their L^p norms.
 
 This is the analytical core. Two functions are stubs (``persistence_landscape``,
-``lp_norm``); one is implemented (``mean_landscape``), but read *why* it can be
-implemented as a plain pointwise mean — that constraint dictates the shape of
-the landscape API and is the whole reason a per-sub-window scalar is the wrong
-return type.
+``lp_norm``); one is implemented (``mean_landscape``)
 
 The reference in the risk formula is the norm of the MEAN landscape,
 ||mean_j eta^(j)||, not the mean of the norms. Since a norm is convex, not

@@ -1,7 +1,4 @@
 """The topological-risk portfolio (TDA-PO).
-
-One stub: the quadratic program. Left to you because formulating and solving it
-is the modelling payoff.
 """
 
 from __future__ import annotations

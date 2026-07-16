@@ -19,8 +19,6 @@ Then across assets:
   8. Q = diag(Lambda_i)                                           (risk.py)
   9. w* = argmin w^T Q w  s.t.  sum w = 1, w >= 0                 (portfolio.py)
 
-Steps 3, 5, 6, 7 and 9 are the mathematics and are left as stubs. Steps 1, 2,
-4, 8 and the wiring are provided.
 """
 
 from __future__ import annotations
