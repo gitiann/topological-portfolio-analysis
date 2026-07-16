@@ -7,7 +7,7 @@ topological risk, and the portfolio quadratic program.  The  scaffolding
 (packaging, CLI, test harness and plotting) was written with AI assistance. All
 34 tests pass, and the pipeline has been characterised on real S&P constituent data.
 
-# toporisk — topological risk portfolios
+# Topological risk portfolios
 
 Using topology of data we can avoid model-based estimation errors linked to distributional assumptions or statistical inputs like mean and covariance. A 2026 January paper by Goel, Sharma, Kanniainen (arXiv: https://doi.org/10.48550/arXiv.2601.03974) reports that portfolios constructed using Topological Data Analysis methods outperformed the seven popular portfolio optimization models and two benchmark portfolio strategies, the naive **1/N** portfolio and the S&P 500 market index, in terms of excess mean return and several financial ratios.
 
