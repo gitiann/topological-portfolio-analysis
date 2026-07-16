@@ -1,27 +1,24 @@
 # Status and attribution
 
 This project reproduces the topological portfolio model of Goel, Sharma and
-Kanniainen (2026, arXiv:2601.03974). I implemented the mathematical core myself:
-the Takens embedding, the persistence landscape and its $L^1$ norm, the asset
-topological risk, and the portfolio quadratic program.  The  scaffolding
-(packaging, CLI, test harness and plotting) was written with AI assistance. All
+Kanniainen (2026, arXiv:2601.03974). I implemented the Takens embedding, the persistence landscape and its $L^1$ norm, the asset topological risk, and the portfolio quadratic program.  The  scaffolding (packaging, CLI, test harness and plotting) was written with AI assistance. All
 34 tests pass, and the pipeline has been characterised on real S&P constituent data.
 
 # Topological risk portfolios
 
-Using topology of data we can avoid model-based estimation errors linked to distributional assumptions or statistical inputs like mean and covariance. A 2026 January paper by Goel, Sharma, Kanniainen (arXiv: https://doi.org/10.48550/arXiv.2601.03974) reports that portfolios constructed using Topological Data Analysis methods outperformed the seven popular portfolio optimization models and two benchmark portfolio strategies, the naive **1/N** portfolio and the S&P 500 market index, in terms of excess mean return and several financial ratios.
+Using topology of data we can avoid model-based estimation errors linked to distributional assumptions or statistical inputs like mean and covariance. A 2026 January paper by Goel, Sharma, Kanniainen (arXiv: https://doi.org/10.48550/arXiv.2601.03974) reports that portfolios constructed using Topological Data Analysis methods outperformed the seven popular portfolio optimization models and two benchmark portfolio strategies, the naive **1/N** portfolio and the S&P 500 market index, in terms of excess mean return and several financial ratios. 
 
 The practical argument is dimensional. Minimum-variance needs the full
-covariance matrix with n(n+1)/2 parameters, or 106,953 for 462 assets estimated
-from 252 trading days, at which point the sample covariance is singular.
-Topological risk needs n parameters, one per asset, each estimated from that
+covariance matrix with $n(n+1)/2$ parameters, or $106\, 953$ for $462$ assets estimated
+from $252$ trading days, at which point the sample covariance is singular.
+Topological risk needs $n$ parameters, one per asset, each estimated from that
 asset's own history.
 
-The intuitive idea is that we map a one-dimensional time-series of returns into $\mathbb{R}^3$ space as data-points via Takens' delay embedding. Next we form a simplicial complex using the Vietoris-Rips method by connecting any two data-points that fall within a radius. The radius starts at 0, in which case all points are disconnected (unless they map to the same place, as with constant returns). We continuously increase the radius, and whenever two points fall within it we connect them via an edge. As the radius increases new connections are made, and we are interested in how well the overall shape is connected through the varying radius.
+The intuitive idea of the method is as follows. We map a one-dimensional time-series of returns into $\mathbb{R}^3$ space as data-points via Takens' delay embedding. Next we form a simplicial complex using the Vietoris-Rips method by connecting any two data-points that fall within a radius. The radius starts at $0$, in which case all points are disconnected (unless they map to the same place, as with constant returns). We continuously increase the radius, and whenever two points fall within it we connect them via an edge. As the radius increases new connections are made, and we are interested in how well the overall shape is connected through the varying radius.
 
-It may happen that at some radius $r_i$ we end up with $n$ distinct point-clouds not connected to each other. This is precisely what the 0-th homology group $H_0$ measures: the sequence of merges, each recorded as a (birth, death) pair, where death is the radius at which two components merge. A tightly clustered cloud merges quickly at small radii; a scattered cloud may have components surviving to large radii. We summarise the topology of our space via a **persistence landscape** (a series of time-dependent functions $\eta_k(t)$, $k = 1, 2, \ldots$).
+It may happen that at some radius $r_i$ we end up with $n$ distinct point-clouds not connected to each other. This is precisely what the 0-th homology group $H_0$ measures: the number of distinct components of the space. In this case we start with distinct data-points at radius $0$, then as the radius increases new connections are formed and some points merge. This decreases the total amount of distinct point-clouds, which were just data-points. We continue increaseing the radius and we get a  sequence of merges, each recorded as a (birth, death) pair, where death is the radius at which two components merge. A tightly clustered cloud merges quickly at small radii; a scattered cloud may have components surviving to large radii. We summarise the topology of our space via a **persistence landscape** (a series of time-dependent functions $\eta_k(t)$, $k = 1, 2, \ldots$).
 
-From a topological point of view, more scattering of the point cloud means less stable returns; a more concentrated cloud, more stable. The amount of scatteredness among return observations over time can be quantified using the $L_1$ norm of the persistence landscape. Therefore this norm can effectively track changes in the state of stock return dynamics without any prior distributional assumptions. Lastly, the persistence landscape forms a Banach space, so the theory of random variables can be applied to it. Given a persistence diagram, the landscape is a canonical summary requiring no kernel or bandwidth choice, unlike persistence images.[1] The pipeline that produces the diagram does have parameters, fixed below by convention rather than tuned.
+From a topological point of view, more scattering of the point cloud means less stable returns; a more concentrated cloud, more stable. The amount of scatteredness among return observations over time can be quantified using the $L_1$ norm of the persistence landscape. Therefore this norm can effectively track changes in the state of stock return dynamics without any prior distributional assumptions. Lastly, the persistence landscape forms a Banach space, so the theory of random variables can be applied to it. By definition it involves no parameter and is thus free from parameter tuning and over-fitting risk.[1]
 
 >[1] Bubenik, P., et al. *Statistical topological data analysis using persistence landscapes.* J. Mach. Learn. Res. **16**(1), 77–102 (2015).
 
