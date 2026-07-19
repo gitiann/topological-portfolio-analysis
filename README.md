@@ -37,7 +37,7 @@ topologically calm; these individual divergences were not investigated further.
 
 For each asset *independently*: take its simple-return series, cut it into overlapping sub-windows, Takens-embed each sub-window into a point cloud, compute the H0 (0th homology group, connected components) persistence landscape of each cloud, and measure how much the landscape's L¹ norm *varies* across sub-windows. That variability is the asset's **topological risk** Λᵢ. Assets are then coupled only through a diagonal risk matrix `Q = diag(Λᵢ)` and a long-only quadratic program that minimises `wᵀQw`. There is no cross-asset topology in this model, by design (the paper flags cross-asset coupling as future work).
 
-Fixed parameters, per the paper (verify against your copy): simple returns; `d = 3`, `τ = 1`; sub-window length `T̃ = 126`, shift `h = 21`; H0 only; landscape layer `k = 1`; norm order `p = 1`.
+Fixed parameters, per the paper (verify against your copy): simple returns; `d = 3`, `τ = 1`; sub-window length `T̃ = 126`, shift `h = 21`; $H_0$ only; landscape layer `k = 1`; norm order `p = 1`.
 
 ## Layout
 
