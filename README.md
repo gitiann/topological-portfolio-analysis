@@ -29,7 +29,7 @@ performance claim requires their 462-constituent universe; a 19-name basket
 cannot settle it.
 
 **Topological risk is distinct from volatility.** Across 19 US large-caps
-(2018–2023), Λ ranks assets similarly but not identically to annualised
+(2018–2023), the topological risk $\Lambda$ ranks assets similarly but not identically to annualised
 volatility (Spearman ρ ≈ 0.73). Several names (CAT, XOM) are volatile yet
 topologically calm; these individual divergences were not investigated further.
 
