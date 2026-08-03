@@ -8,10 +8,8 @@ Kanniainen (2026, arXiv:2601.03974). I implemented the Takens embedding, the per
 
 Using topology of data we can avoid model-based estimation errors linked to distributional assumptions or statistical inputs like mean and covariance. A 2026 January paper by Goel, Sharma, Kanniainen (arXiv: https://doi.org/10.48550/arXiv.2601.03974) reports that portfolios constructed using Topological Data Analysis methods outperformed the seven popular portfolio optimization models and two benchmark portfolio strategies, the naive **1/N** portfolio and the S&P 500 market index, in terms of excess mean return and several financial ratios. 
 
-The practical argument is dimensional. Minimum-variance needs the full
-covariance matrix with $n(n+1)/2$ parameters, or $106\, 953$ for $462$ assets estimated
-from $252$ trading days, at which point the sample covariance is singular.
-Topological risk estimates only $n$ quantities, the per-asset risks $\Lambda_i$, because the risk matrix $Q = diag(\Lambda_i)$ is diagonal by construction. (Each $\Lambda_i$ is computed with fixed hyperparameters $d=3,\tau=1,\tilde T= 126, h=12,k=1,p=1,$ set by convention rather than tuned.)
+The practical argument is dimensional. Authors used $462$ assets with time-series data of almost a decade.  Minimum-variance needs the full covariance matrix with $n(n+1)/2$ parameters, or $106\, 953$ for $462$ assets estimated from a window of $252$ trading days, at which point the sample covariance is singular.
+Topological risk estimates only $n$ quantities, the per-asset risks $\Lambda_i$, because the risk matrix $Q = diag(\Lambda_i)$ is diagonal by construction. (Each $\Lambda_i$ is computed with fixed hyperparameters $d=3,\tau=1,\tilde T= 126, h=21,k=1,p=1,$ set by convention rather than tuned.)
 
 The intuitive idea of the method is as follows. We map a one-dimensional time-series of returns into $\mathbb{R}^3$ space as data-points via Takens' delay embedding. Next we form a simplicial complex using the Vietoris-Rips method by connecting any two data-points that fall within a radius. The radius starts at $0$, in which case all points are disconnected (unless they are located at the same place, as with constant returns). We continuously increase the radius, and whenever two points fall within it we connect them via an edge. As the radius increases new connections are made, and we are interested in how well the overall shape is connected through the varying radius.
 
