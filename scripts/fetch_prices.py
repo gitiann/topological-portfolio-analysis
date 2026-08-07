@@ -1,11 +1,24 @@
-"""Download S&P500 historical adjusted close series for ticker list.
+"""Download daily adjusted close series for a list of tickers.
 
-This script uses `yfinance` to fetch daily adjusted close prices for a
-list of tickers (default: SPY as S&P500 proxy). It writes CSVs into
-`data/` for use by the model.
+Uses `yfinance` to fetch split/dividend-adjusted daily closes and writes one
+CSV per ticker into the output directory, in the format the model expects:
+
+    date,price
+    2020-01-02,235.95
+
+Works for any Yahoo Finance symbol, not just equities:
+    equities   AAPL, VOD.L, 7203.T, SAP.DE
+    indices    ^GSPC, ^FTSE, ^N225
+    crypto     BTC-USD, ETH-USD
+    FX         EURUSD=X, GBPUSD=X
+    futures    GC=F, CL=F, NG=F
 
 Usage:
-    python scripts/fetch_sp500.py --tickers SPY AAPL MSFT --start 2018-01-01 --end 2023-12-31
+    python scripts/fetch_prices.py --tickers SPY AAPL MSFT --start 2018-01-01 --end 2023-12-31
+    python scripts/fetch_prices.py --tickers BTC-USD 'GC=F' '^GSPC' --outdir data/cross_asset
+
+Note: quote symbols containing `=` or `^` so the shell does not expand them.
+Tickers with no data in the requested window are skipped with a message.
 """
 import argparse
 import pathlib
