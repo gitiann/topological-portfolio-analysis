@@ -2,7 +2,8 @@
 
 This project reproduces the topological portfolio model of Goel, Sharma and
 Kanniainen (2026, arXiv:2601.03974). I implemented the Takens embedding, the persistence landscape and its $L^1$ norm, the asset topological risk, and the portfolio quadratic program.  The  scaffolding (packaging, CLI, test harness and plotting) was written with AI assistance. All
-34 tests pass, and the pipeline has been characterised on real S&P constituent data.
+34 tests pass, and the pipeline has been characterised on real market data across
+equities, FX, commodities, indices and crypto.
 
 # Topological risk portfolios
 
@@ -13,7 +14,7 @@ Topological risk estimates only $n$ quantities, the per-asset risks $\Lambda_i$,
 
 The intuitive idea of the method is as follows. We map a one-dimensional time-series of returns into $\mathbb{R}^3$ space as data-points via Takens' delay embedding. Next we form a simplicial complex using the Vietoris-Rips method by connecting any two data-points that fall within a radius. The radius starts at $0$, in which case all points are disconnected (unless they are located at the same place, as with constant returns). We continuously increase the radius, and whenever two points fall within it we connect them via an edge. As the radius increases new connections are made, and we are interested in how well the overall shape is connected through the varying radius.
 
-It may happen that at some radius $r_i$ we end up with $n$ distinct point-clouds not connected to each other. This is precisely what the $0$-th homology group $H_0$ measures: the number of distinct components of the space. In our case we start with distinct data-points at radius $0$, then as the radius increases new connections are formed and some points merge. This decreases the total amount of distinct point-clouds, which were just data-points. We continue increaseing the radius and we get a  sequence of merges, each recorded as a (birth, death) pair, where death is the radius at which two components merge. A tightly clustered cloud merges quickly at small radii; a scattered cloud may have components surviving to large radii. We summarise the topology of our space via a **persistence landscape** (a series of time-dependent functions $\eta_k(t)$, $k = 1, 2, \ldots$).
+It may happen that at some radius $r_i$ we end up with $n$ distinct point-clouds not connected to each other. This is precisely what the $0$-th homology group $H_0$ measures: the number of distinct components of the space. In our case we start with distinct data-points at radius $0$, then as the radius increases new connections are formed and some points merge. This decreases the total amount of distinct point-clouds, which were just data-points. We continue increaseing the radius and get a  sequence of merges, each recorded as a (birth, death) pair, where death is the radius at which two components merge. A tightly clustered cloud merges quickly at small radii; a scattered cloud may have components surviving to large radii. We summarise the topology of our space via a **persistence landscape** (a series of time-dependent functions $\eta_k(t)$, $k = 1, 2, \ldots$).
 
 From a topological point of view, more scattering of the point cloud means less stable returns; a more concentrated cloud, more stable. The amount of scatteredness among return observations over time can be quantified using the $L_1$ norm of the persistence landscape. Therefore this norm can effectively track changes in the state of stock return dynamics without any prior distributional assumptions. Lastly, the persistence landscape forms a Banach space, so the theory of random variables can be applied to it. By definition it involves no parameter and is thus free from parameter tuning and over-fitting risk.[1]
 
@@ -26,7 +27,7 @@ measure. **Portfolio performance is not evaluated here**; testing the paper's
 performance claim requires their 462-constituent universe; a 19-name basket
 cannot settle it.
 
-**Topological risk is distinct from volatility.** Across 19 US large-caps (2018–2023), Λ ranked assets similarly but not identically to annualised volatility (Spearman ρ ≈ 0.73). On a wider 20-instrument cross-section spanning FX, bonds, commodities, indices and crypto (2020–2026), the agreement is much stronger (ρ ≈ 0.95), suggesting the lower correlation within equities reflects the narrow volatility range of that sample rather than genuinely independent information.
+**How Λ relates to volatility.** Across 19 US large-caps (2018–2023), Λ ranked assets similarly but not identically to annualised volatility (Spearman ρ ≈ 0.73). On a wider 20-instrument cross-section spanning FX, bonds, commodities, indices and crypto (2020–2026), the agreement is much stronger (ρ ≈ 0.95), suggesting the lower correlation within equities reflects the narrow volatility range of that sample rather than genuinely independent information.
 
 ## The model
 
@@ -47,7 +48,7 @@ src/toporisk/
    cli.py         toporisk build ...                       
    viz.py         weight + landscape plots                    
 tests/           pytest (34 passing)
-scripts/         make_sample_data.py
+scripts/         make_sample_data.py, fetch_prices.py, compare_risk_vs_vol.py
 ```
 
 
@@ -64,7 +65,39 @@ pip install -e ".[dev,qp]"
 python scripts/make_sample_data.py
 pytest
 toporisk build --prices data/sample_prices.csv --out figures/weights.png
+
 ```
+
+## Example: testing Λ against volatility on arbitrary markets
+
+Fetch a cross-asset basket and compare topological risk against annualised
+volatility. Requires `yfinance` (not a core dependency):
+
+```bash
+pip install yfinance
+
+python scripts/fetch_prices.py --tickers \
+  BTC-USD ETH-USD SOL-USD \
+  'GC=F' 'SI=F' 'NG=F' 'ZC=F' \
+  'EURUSD=X' 'GBPUSD=X' 'USDJPY=X' \
+  '^GSPC' '^FTSE' '^N225' \
+  TLT HYG KO TSLA \
+  VOD.L 7203.T SAP.DE \
+  --start 2020-01-01 --end 2026-08-07
+
+python scripts/compare_risk_vs_vol.py --files \
+  data/*-USD.csv data/*=*.csv data/^*.csv \
+  data/TLT.csv data/HYG.csv data/KO.csv data/TSLA.csv \
+  data/VOD.L.csv data/7203.T.csv data/SAP.DE.csv
+```
+
+Quote tickers containing `=` or `^` so the shell doesn't expand them. Do not
+glob `data/*.csv` — that would include `sample_prices.csv`, which is a wide
+multi-asset panel rather than a single series, and it will be misread as one
+asset.
+
+Output is a table of Λ and annualised volatility per instrument with their
+ranks, plus the Spearman rank correlation between the two.
 
 ## Implementation notes
 
