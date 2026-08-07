@@ -45,6 +45,7 @@ def main(argv: list[str] | None = None) -> int:
         # use the last `window` days as the training window
         returns = returns.tail(args.window)
         assets = list(returns.columns)
+        risks = np.array([asset_topological_risk(...) for a in assets])
 
         print(f"{'asset':>12}  {'Lambda':>12}  {'weight':>8}")
         for a, lam, w in zip(assets, risks, weights, strict=True):
