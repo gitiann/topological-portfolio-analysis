@@ -68,7 +68,6 @@ toporisk build --prices data/sample_prices.csv --out figures/weights.png
 
 ```
 
-## Example: testing Λ against volatility on arbitrary markets
 
 ## Example: testing Λ against volatility on arbitrary markets
 
