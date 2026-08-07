@@ -29,31 +29,6 @@ cannot settle it.
 
 **How Λ relates to volatility.** Across 19 US large-caps (2018–2023), Λ ranked assets similarly but not identically to annualised volatility (Spearman ρ ≈ 0.73). On a wider 20-instrument cross-section spanning FX, bonds, commodities, indices and crypto (2020–2026), the agreement is much stronger (ρ ≈ 0.95), suggesting the lower correlation within equities reflects the narrow volatility range of that sample rather than genuinely independent information.
 
-## The model
-
-For each asset *independently*: take its simple-return series, cut it into overlapping sub-windows, Takens-embed each sub-window into a point cloud, compute the H0 (0th homology group, connected components) persistence landscape of each cloud, and measure how much the landscape's L¹ norm *varies* across sub-windows. That variability is the asset's **topological risk** Λᵢ. Assets are then coupled only through a diagonal risk matrix `Q = diag(Λᵢ)` and a long-only quadratic program that minimises `wᵀQw`. There is no cross-asset topology in this model, by design (the paper flags cross-asset coupling as future work).
-
-Fixed parameters, per the paper (verify against your copy): simple returns; `d = 3`, `τ = 1`; sub-window length `T̃ = 126`, shift `h = 21`; $H_0$ only; landscape layer `k = 1`; norm order `p = 1`.
-
-## Layout
-
-```
-src/toporisk/
-   data.py        load prices, simple returns                 
-   embedding.py   sub_windows, takens_embedding               
-   topology.py    Gudhi H0 diagram, finite_pairs              
-   landscape.py   mean_landscape, persistence_landscape, lp_norm   
-   risk.py        risk_matrix, asset_topological_risk         
-   portfolio.py   min_topological_risk_portfolio              
-   cli.py         toporisk build ...                       
-   viz.py         weight + landscape plots                    
-tests/           pytest (34 passing)
-scripts/         make_sample_data.py, fetch_prices.py, compare_risk_vs_vol.py
-```
-
-
-
-
 
 ## Install & run
 
@@ -90,6 +65,29 @@ asset.
 
 Output is a table of Λ and annualised volatility per instrument with their
 ranks, plus the Spearman rank correlation between the two.
+
+## The model
+
+For each asset *independently*: take its simple-return series, cut it into overlapping sub-windows, Takens-embed each sub-window into a point cloud, compute the H0 (0th homology group, connected components) persistence landscape of each cloud, and measure how much the landscape's L¹ norm *varies* across sub-windows. That variability is the asset's **topological risk** Λᵢ. Assets are then coupled only through a diagonal risk matrix `Q = diag(Λᵢ)` and a long-only quadratic program that minimises `wᵀQw`. There is no cross-asset topology in this model, by design (the paper flags cross-asset coupling as future work).
+
+Fixed parameters, per the paper (verify against your copy): simple returns; `d = 3`, `τ = 1`; sub-window length `T̃ = 126`, shift `h = 21`; $H_0$ only; landscape layer `k = 1`; norm order `p = 1`.
+
+## Layout
+
+```
+src/toporisk/
+   data.py        load prices, simple returns                 
+   embedding.py   sub_windows, takens_embedding               
+   topology.py    Gudhi H0 diagram, finite_pairs              
+   landscape.py   mean_landscape, persistence_landscape, lp_norm   
+   risk.py        risk_matrix, asset_topological_risk         
+   portfolio.py   min_topological_risk_portfolio              
+   cli.py         toporisk build ...                       
+   viz.py         weight + landscape plots                    
+tests/           pytest (34 passing)
+scripts/         make_sample_data.py, fetch_prices.py, compare_risk_vs_vol.py
+```
+
 
 ## Implementation notes
 
