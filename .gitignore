@@ -16,3 +16,6 @@ figures/
 *.png
 .DS_Store
 *.log
+scripts/backtest.py
+scripts/run_risk_on_csvs.py
+scripts/run_risk_sp500.py
