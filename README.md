@@ -60,6 +60,8 @@ scripts/         make_sample_data.py
 ## Install & run
 
 ```bash
+git clone https://github.com/gitiann/topological-portfolio-analysis
+cd topological-portfolio-analysis
 python -m venv .venv && source .venv/bin/activate
 pip install -e ".[dev,qp]"
 python scripts/make_sample_data.py
