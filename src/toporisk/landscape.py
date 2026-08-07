@@ -51,7 +51,7 @@ def persistence_landscape(
     breaks the mean-landscape step. If ``x_range`` is None, decide on a sensible
     shared default and document it -- but the caller in ``risk.py`` should pin it.
 
-    You may build the tent functions yourself (good for understanding), or use
+   The tent functions can be implemented from Gudhi library: use
     ``gudhi.representations.Landscape`` with a fixed ``sample_range``. Either way,
     handle the empty diagram: return zeros of shape ``(num_layers, resolution)``.
 

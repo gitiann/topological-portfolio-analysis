@@ -1,8 +1,5 @@
 """Sub-windowing and Takens delay embedding.
 
-``sub_windows`` is implemented (outer windowing bookkeeping). ``takens_embedding``
-is the first piece of mathematics you write: you derived its shape already
-(length-126 series, d=3, tau=1 -> 124 x 3).
 """
 
 from __future__ import annotations

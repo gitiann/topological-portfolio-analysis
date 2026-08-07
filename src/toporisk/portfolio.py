@@ -8,7 +8,7 @@ from numpy.typing import NDArray
 
 
 def min_topological_risk_portfolio(Q: NDArray[np.float64]) -> NDArray[np.float64]:
-    """Long-only minimum-topological-risk weights.  [TODO]
+    """Long-only minimum-topological-risk weights.  [IMPLEMENTED]
 
     Solve the convex quadratic program
 
