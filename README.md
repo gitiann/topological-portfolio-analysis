@@ -70,6 +70,8 @@ toporisk build --prices data/sample_prices.csv --out figures/weights.png
 
 ## Example: testing Λ against volatility on arbitrary markets
 
+## Example: testing Λ against volatility on arbitrary markets
+
 Fetch a cross-asset basket (FX, bonds, commodities, indices, crypto) and compare
 topological risk against annualised volatility. Requires `yfinance`:
 
@@ -81,7 +83,6 @@ bash scripts/example_cross_asset.sh 2020-01-01 2026-08-07
 Downloads into `data/cross_asset/` and prints Λ and annualised volatility per
 instrument with their ranks, plus the Spearman rank correlation between the two.
 Edit the ticker list in the script to use your own basket.
-```
 
 Quote tickers containing `=` or `^` so the shell doesn't expand them. Do not
 glob `data/*.csv` — that would include `sample_prices.csv`, which is a wide
