@@ -26,10 +26,7 @@ measure. **Portfolio performance is not evaluated here**; testing the paper's
 performance claim requires their 462-constituent universe; a 19-name basket
 cannot settle it.
 
-**Topological risk is distinct from volatility.** Across 19 US large-caps
-(2018–2023), topological risk ranks assets similarly but not identically to annualised
-volatility (Spearman ρ ≈ 0.73). Several names (CAT, XOM) are volatile yet
-topologically calm; these individual divergences were not investigated further.
+**Topological risk is distinct from volatility.** Across 19 US large-caps (2018–2023), Λ ranked assets similarly but not identically to annualised volatility (Spearman ρ ≈ 0.73). On a wider 20-instrument cross-section spanning FX, bonds, commodities, indices and crypto (2020–2026), the agreement is much stronger (ρ ≈ 0.95), suggesting the lower correlation within equities reflects the narrow volatility range of that sample rather than genuinely independent information.
 
 ## The model
 
