@@ -70,25 +70,17 @@ toporisk build --prices data/sample_prices.csv --out figures/weights.png
 
 ## Example: testing Λ against volatility on arbitrary markets
 
-Fetch a cross-asset basket and compare topological risk against annualised
-volatility. Requires `yfinance` (not a core dependency):
+Fetch a cross-asset basket (FX, bonds, commodities, indices, crypto) and compare
+topological risk against annualised volatility. Requires `yfinance`:
 
 ```bash
 pip install yfinance
+bash scripts/example_cross_asset.sh 2020-01-01 2026-08-07
+```
 
-python scripts/fetch_prices.py --tickers \
-  BTC-USD ETH-USD SOL-USD \
-  'GC=F' 'SI=F' 'NG=F' 'ZC=F' \
-  'EURUSD=X' 'GBPUSD=X' 'USDJPY=X' \
-  '^GSPC' '^FTSE' '^N225' \
-  TLT HYG KO TSLA \
-  VOD.L 7203.T SAP.DE \
-  --start 2020-01-01 --end 2026-08-07
-
-python scripts/compare_risk_vs_vol.py --files \
-  data/*-USD.csv data/*=*.csv data/^*.csv \
-  data/TLT.csv data/HYG.csv data/KO.csv data/TSLA.csv \
-  data/VOD.L.csv data/7203.T.csv data/SAP.DE.csv
+Downloads into `data/cross_asset/` and prints Λ and annualised volatility per
+instrument with their ranks, plus the Spearman rank correlation between the two.
+Edit the ticker list in the script to use your own basket.
 ```
 
 Quote tickers containing `=` or `^` so the shell doesn't expand them. Do not
