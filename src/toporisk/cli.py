@@ -46,27 +46,9 @@ def main(argv: list[str] | None = None) -> int:
         returns = returns.tail(args.window)
         assets = list(returns.columns)
 
-        try:
-            risks = np.array(
-                [
-                    asset_topological_risk(
-                        asset_series(returns, a),
-                        sub_len=args.sub_len,
-                        shift=args.shift,
-                        d=args.d,
-                        tau=args.tau,
-                    )
-                    for a in assets
-                ]
-            )
-            Q = risk_matrix(risks)
-            weights = min_topological_risk_portfolio(Q)
-        except NotImplementedError as exc:
-            print(f"pipeline is not fully implemented yet: {exc}", file=sys.stderr)
-            return 2
-
-        for a, w in zip(assets, weights, strict=True):
-            print(f"{a:>12}  {w:8.4f}")
+        print(f"{'asset':>12}  {'Lambda':>12}  {'weight':>8}")
+        for a, lam, w in zip(assets, risks, weights, strict=True):
+            print(f"{a:>12} {lam:12.6e} {w:8.4f}")
 
         plot_weights(assets, weights)
         if args.out:
